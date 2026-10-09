@@ -1,0 +1,80 @@
+// ==UserScript==
+// @name         TendiChat - Guia Manager Pro
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Abre o Guia Manager Pro com pesquisa direta a partir do TendiChat.
+// @match        *://*.tendichat.com.br/*
+// @match        *://tendichat.com.br/*
+// @run-at       document-end
+// @grant        none
+// ==/UserScript==
+
+(function () {
+    'use strict';
+
+    const PORTAL_URL = 'https://caio-csar.github.io/guia-manager-pro/';
+
+    function abrirPortal(termo) {
+        const url = new URL(PORTAL_URL);
+        if (termo && termo.trim()) {
+            url.searchParams.set('q', termo.trim());
+        }
+        window.open(url.toString(), '_blank');
+    }
+
+    function abrirPesquisaRapida() {
+        const termo = prompt('Pesquisar no Guia Manager Pro:', '');
+        if (termo !== null) abrirPortal(termo);
+    }
+
+    function criarBotao() {
+        const btn = document.createElement('button');
+        btn.id = 'tm-btn-guia-manager-pro';
+        btn.innerText = 'G';
+        btn.title = 'Abrir Guia Manager Pro';
+
+        Object.assign(btn.style, {
+            width: '28px',
+            height: '28px',
+            minWidth: '28px',
+            padding: '0',
+            border: 'none',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg,#0ea5e9,#2563eb)',
+            color: '#fff',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '15px',
+            fontWeight: '900',
+            cursor: 'pointer',
+            lineHeight: '1',
+            transition: 'all .15s ease',
+            boxShadow: '0 2px 10px rgba(37,99,235,.35)'
+        });
+
+        btn.onmouseenter = () => {
+            btn.style.transform = 'translateY(-1px) scale(1.05)';
+        };
+
+        btn.onmouseleave = () => {
+            btn.style.transform = 'translateY(0) scale(1)';
+        };
+
+        btn.onclick = abrirPesquisaRapida;
+        return btn;
+    }
+
+    function inserirBotao() {
+        const btnRelato = document.getElementById('helper-btn-ia');
+        if (!btnRelato) return;
+        if (document.getElementById('tm-btn-guia-manager-pro')) return;
+
+        const caixa = btnRelato.parentElement;
+        if (!caixa) return;
+
+        btnRelato.insertAdjacentElement('afterend', criarBotao());
+    }
+
+    setInterval(inserirBotao, 500);
+})();
